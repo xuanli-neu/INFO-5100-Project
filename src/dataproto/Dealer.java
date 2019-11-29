@@ -10,7 +10,7 @@ public class Dealer extends DataObject {
   private Collection<Vehicle> vehicles;
   private String emailId;
   private Collection<Incentive> incentives;
-  private Collection<Leads> leads;
+  private Collection<Lead> leads;
 
   private String headInfoId;
   private String footInfoId;
