@@ -6,11 +6,27 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
-    /*
-    * Page components
-    * */
+    // dealer icon image path(absolute path)
+    private final String curDealerIconPath = "/Users/leichenzhou/Documents/Fall2019Semester/info-5100/final5100_module1/INFO-5100-Project/src/m1/team14/images/businessman64px.png";
+    private final String scrollIconPath = "/Users/leichenzhou/Documents/Fall2019Semester/info-5100/final5100_module1/INFO-5100-Project/src/m1/team14/images/businessman32px.png";
+    private List<String> dealers;
+    private static int numOfDealers = 8;  // for test
+
+    List<String> getDealers(int num){
+        List<String> allDealers = new ArrayList<>();
+
+        for (int i = 1; i <= num; i++){
+            String dealerId = "Dealer " + i;
+            allDealers.add(dealerId);
+        }
+
+        return allDealers;
+    }
+
     // include the header part, like current dealer img, search, login, history
     private JPanel headPanel;
 
@@ -25,16 +41,13 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
     private JButton historyBtn;
 
     // scrollable bar
-    private JPanel scrollPanel;
-    private JLabel leftShiftLabel;
-    private JLabel rightShiftLabel;
+    private JScrollPane scrollPanel;
+    private JPanel viewPanel;
 
     // test panel for the layout testing
     private JPanel blankPanel;
 
-    /*
-    * Page controller
-    * */
+    // Page controller
     private AbstractController homepageUpCtrl;
 
     public HomepageFrame() {
@@ -47,8 +60,10 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
     @Override
     public void create() {
         headPanel = new JPanel();
+
+        // current dealer panel
         curDealerIconPanel = new JPanel();
-        curDealerIcon = new ImageIcon("/Users/leichenzhou/Documents/Fall2019Semester/info-5100/final5100_module1/INFO-5100-Project/src/m1/team14/images/businessman64px.png");
+        curDealerIcon = new ImageIcon(curDealerIconPath);
         curDealerImg = new JLabel(curDealerIcon);
         curDealerLabel = new JLabel("Current Dealer");
 
@@ -58,6 +73,10 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
         searchBtn.setBounds(0, 0, 100, 100);
         loginBtn = new JButton("Login");
         historyBtn = new JButton("History");
+
+        // scroll panel
+//        scrollPanel = new JScrollPane();
+        viewPanel = new JPanel();
     }
 
     @Override
@@ -65,10 +84,44 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
         // addCurDealerIcon
         Container mainPanel = getContentPane();
         addCurDealerIcon(curDealerIconPanel);
+
         addButtons(buttonPanel);
+
+        addViewPanel(viewPanel);
+
         addHeadPanel(headPanel);
 
         addToMain(mainPanel);
+    }
+
+    private void addViewPanel(JPanel viewPanel) {
+        this.dealers = getDealers(numOfDealers);
+
+        for (String dealer : dealers){
+            viewPanel.add(createIconPanel(dealer));
+        }
+    }
+
+    private JPanel createIconPanel(String dealer) {
+        JPanel padPanel = new JPanel();
+        padPanel.setBorder(new EmptyBorder(2,1,2,1));
+
+        JPanel dealerPanel = new JPanel(new BorderLayout());
+
+        JPanel iconPanel = new JPanel();
+        ImageIcon dealImg = new ImageIcon(scrollIconPath);
+        JLabel iconLabel = new JLabel(dealImg);
+        iconPanel.add(iconLabel);
+
+        JPanel labelPanel = new JPanel();
+        JLabel dealerIdLabel = new JLabel(dealer);
+        labelPanel.add(dealerIdLabel);
+
+        dealerPanel.add(iconPanel, BorderLayout.CENTER);
+        dealerPanel.add(labelPanel, BorderLayout.SOUTH);
+
+        padPanel.add(dealerPanel);
+        return padPanel;
     }
 
     private void addHeadPanel(JPanel headPanel) {
@@ -77,10 +130,18 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
 
         hbox1.add(curDealerIconPanel);
         hbox1.add(Box.createHorizontalStrut(140));
-        hbox2.add(buttonPanel);
+        hbox1.add(buttonPanel);
 
-        headPanel.add(hbox1);
-        headPanel.add(hbox2);
+        scrollPanel = new JScrollPane(viewPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPanel.setPreferredSize(new Dimension(400, 100));
+        hbox2.add(scrollPanel);
+
+        Box vbox1 = Box.createVerticalBox();
+        vbox1.add(hbox1);
+        vbox1.add(Box.createVerticalStrut(30));
+        vbox1.add(hbox2);
+
+        headPanel.add(vbox1);
         headPanel.setBorder(new EmptyBorder(20, 10, 20, 10));
     }
 
@@ -93,6 +154,20 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
 
     }
 
+    /*
+    * Add component to container with the GridBagConstrains
+    * @param: target container
+    * @param: added component
+    * @param: GridBagConstrain
+    * @param: x coordinator of grid
+    * @param: y coordinator of grid
+    * @param: grid width
+    * @param: grid height
+    * @param: the grid's weight of the whole grid width
+    * @param: the grid's weight of the whole grid height
+    * @param: grid fill strategy
+    * @param: grid anchor strategy
+    * */
     private void fillButtonPanel(JPanel container,
                                  JComponent component,
                                  GridBagConstraints constraints,
@@ -123,10 +198,8 @@ public class HomepageFrame extends BaseGuiFrame implements IViewPanel {
 
         JPanel imagePanel = new JPanel();
         imagePanel.add(curDealerImg);
-        JPanel labelPanel = new JPanel();
-        labelPanel.add(curDealerLabel);
         curDealerIconPanel.add(imagePanel, BorderLayout.CENTER);
-        curDealerIconPanel.add(labelPanel, BorderLayout.SOUTH);
+        curDealerIconPanel.add(curDealerLabel, BorderLayout.SOUTH);
     }
 
     @Override
